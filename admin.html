@@ -3,301 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Manage Cadets and Blogs</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Admin Panel</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        body {
-            background: #f8f9fa;
-        }
+        /* Custom Styles */
         .container {
-            margin-top: 50px;
+            margin-top: 20px;
         }
-        table th, table td {
-            vertical-align: middle;
+        .form-group {
+            margin: 15px 0;
+        }
+        .blog-preview {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">NCC Admin</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="attendance.html">Attendance</a></li>
-                    <li class="nav-item"><a class="nav-link" href="events.html">Events</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
     <div class="container">
-        <h2 class="text-center">Manage Cadets</h2>
-        <form id="cadetForm" class="mb-4">
-            <div class="mb-3">
-                <label for="cadetID" class="form-label">Cadet ID</label>
-                <input type="text" class="form-control" id="cadetID" required>
+        <h1 class="text-center">Admin Panel</h1>
+
+        <h2>Add New Cadet</h2>
+        <form id="cadetForm">
+            <div class="form-group">
+                <input type="text" class="form-control" id="cadetID" placeholder="Cadet ID" required>
             </div>
-            <div class="mb-3">
-                <label for="cadetName" class="form-label">Name</label>
-                <input type="text" class="form-control" id="cadetName" required>
+            <div class="form-group">
+                <input type="text" class="form-control" id="cadetName" placeholder="Name" required>
             </div>
-            <div class="mb-3">
-                <label for="cadetRank" class="form-label">Rank</label>
-                <input type="text" class="form-control" id="cadetRank" required>
+            <div class="form-group">
+                <input type="text" class="form-control" id="cadetRank" placeholder="Rank" required>
             </div>
-            <button type="submit" class="btn btn-primary" id="addCadetBtn">Add Cadet</button>
+            <button type="submit" class="btn btn-primary">Add Cadet</button>
         </form>
 
-        <h3 class="text-center">Cadets List</h3>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Cadet ID</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Rank</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="cadetsTableBody">
-                <!-- Cadet data will be appended here -->
-            </tbody>
-        </table>
-
-        <!-- Blog Management Section -->
-        <h2 class="text-center mt-5">Manage Blogs</h2>
-        <form id="blogForm" class="mb-4">
-            <div class="mb-3">
-                <label for="blogTitle" class="form-label">Blog Title</label>
-                <input type="text" class="form-control" id="blogTitle" required>
+        <h2>Add New Blog Post</h2>
+        <form id="blogForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="text" class="form-control" id="blogTitle" placeholder="Blog Title" required>
             </div>
-            <div class="mb-3">
-                <label for="blogContent" class="form-label">Blog Content</label>
-                <textarea class="form-control" id="blogContent" rows="5" required></textarea>
+            <div class="form-group">
+                <textarea class="form-control" id="blogContent" placeholder="Blog Content" rows="5" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary" id="addBlogBtn">Add Blog</button>
+            <div class="form-group">
+                <label for="fontSelect">Select Font:</label>
+                <select class="form-control" id="fontSelect">
+                    <option value="Arial">Arial</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Verdana">Verdana</option>
+                </select>
+                <button type="button" class="btn btn-secondary" onclick="makeBold()">Bold</button>
+                <button type="button" class="btn btn-secondary" onclick="makeItalic()">Italic</button>
+            </div>
+            <div class="form-group">
+                <input type="file" class="form-control-file" id="blogImage" accept="image/*">
+                <input type="text" class="form-control" id="imageUrl" placeholder="Or Enter Image URL">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Blog Post</button>
         </form>
 
-        <h3 class="text-center">Blogs List</h3>
-        <table class="table table-striped">
+        <h2>Cadets List</h2>
+        <table class="table table-bordered" id="cadetsTable">
             <thead>
                 <tr>
-                    <th scope="col">Title</th>
-                    <th scope="col">Content</th>
-                    <th scope="col">Actions</th>
+                    <th>Cadet ID</th>
+                    <th>Name</th>
+                    <th>Rank</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="blogsTableBody">
-                <!-- Blog data will be appended here -->
-            </tbody>
+            <tbody></tbody>
         </table>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script>
-        const cadetApiUrl = 'https://qa-admin-zj4d.onrender.com/api/cadets';
-        const blogApiUrl = 'https://qa-admin-zj4d.onrender.com/api/blogs';
-
-        // Fetch cadets from the API
-        async function fetchCadets() {
-            const response = await fetch(cadetApiUrl);
-            const cadets = await response.json();
-            const cadetsTableBody = document.getElementById('cadetsTableBody');
-            cadetsTableBody.innerHTML = ''; // Clear existing data
-
-            cadets.forEach(cadet => {
-                const row = `
-                    <tr>
-                        <td>${cadet.cadetID}</td>
-                        <td>${cadet.name}</td>
-                        <td>${cadet.rank}</td>
-                        <td>
-                            <button class="btn btn-warning" onclick="editCadet('${cadet._id}', '${cadet.cadetID}', '${cadet.name}', '${cadet.rank}')">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteCadet('${cadet._id}')">Delete</button>
-                        </td>
-                    </tr>
-                `;
-                cadetsTableBody.insertAdjacentHTML('beforeend', row);
-            });
-        }
-
-        // Add a new cadet
-        document.getElementById('cadetForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
+        document.getElementById('cadetForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
             const cadetID = document.getElementById('cadetID').value;
             const cadetName = document.getElementById('cadetName').value;
             const cadetRank = document.getElementById('cadetRank').value;
 
-            const response = await fetch(cadetApiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ cadetID, name: cadetName, rank: cadetRank })
-            });
-
-            if (response.ok) {
-                alert('Cadet added successfully!');
-                fetchCadets(); // Refresh the cadet list
-                document.getElementById('cadetForm').reset(); // Reset the form
-            } else {
-                alert('Failed to add cadet.');
+            try {
+                const response = await fetch('https://qa-admin-zj4d.onrender.com/api/cadets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cadetID, name: cadetName, rank: cadetRank })
+                });
+                const data = await response.json();
+                alert(data.message);
+                loadCadets(); // Refresh cadets list
+            } catch (error) {
+                console.error('Error adding cadet:', error);
             }
         });
 
-        // Edit cadet
-        async function editCadet(id, cadetID, name, rank) {
-            document.getElementById('cadetID').value = cadetID;
-            document.getElementById('cadetName').value = name;
-            document.getElementById('cadetRank').value = rank;
+        document.getElementById('blogForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('blogTitle').value;
+            const content = document.getElementById('blogContent').value;
+            const image = document.getElementById('blogImage').files[0];
 
-            // Remove the add button and replace it with an update button
-            const addCadetBtn = document.getElementById('addCadetBtn');
-            addCadetBtn.innerText = 'Update Cadet';
-            addCadetBtn.onclick = async () => {
-                const updatedCadet = {
-                    cadetID: document.getElementById('cadetID').value,
-                    name: document.getElementById('cadetName').value,
-                    rank: document.getElementById('cadetRank').value
-                };
-
-                const response = await fetch(`${cadetApiUrl}/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updatedCadet)
-                });
-
-                if (response.ok) {
-                    alert('Cadet updated successfully!');
-                    fetchCadets(); // Refresh the cadet list
-                    addCadetBtn.innerText = 'Add Cadet'; // Reset button text
-                    addCadetBtn.onclick = addCadet; // Reset button function
-                    document.getElementById('cadetForm').reset(); // Reset the form
-                } else {
-                    alert('Failed to update cadet.');
-                }
-            };
-        }
-
-        // Delete cadet
-        async function deleteCadet(id) {
-            const response = await fetch(`${cadetApiUrl}/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                alert('Cadet deleted successfully!');
-                fetchCadets(); // Refresh the cadet list
-            } else {
-                alert('Failed to delete cadet.');
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('content', content);
+            if (image) {
+                formData.append('image', image);
             }
-        }
 
-        // Fetch blogs from the API
-        async function fetchBlogs() {
-            const response = await fetch(blogApiUrl);
-            const blogs = await response.json();
-            const blogsTableBody = document.getElementById('blogsTableBody');
-            blogsTableBody.innerHTML = ''; // Clear existing data
+            try {
+                const response = await fetch('https://qa-admin-zj4d.onrender.com/api/blogs', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                alert(data.message);
+                document.getElementById('blogForm').reset(); // Reset the form after submission
+            } catch (error) {
+                console.error('Error adding blog post:', error);
+            }
+        });
 
-            blogs.forEach(blog => {
-                const row = `
-                    <tr>
-                        <td>${blog.title}</td>
-                        <td>${blog.content.substring(0, 50)}...</td>
-                        <td>
-                            <button class="btn btn-warning" onclick="editBlog('${blog._id}', '${blog.title}', '${blog.content}')">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteBlog('${blog._id}')">Delete</button>
-                        </td>
-                    </tr>
+        async function loadCadets() {
+            const response = await fetch('https://qa-admin-zj4d.onrender.com/api/cadets');
+            const cadets = await response.json();
+            const tbody = document.getElementById('cadetsTable').querySelector('tbody');
+            tbody.innerHTML = '';
+            cadets.forEach(cadet => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cadet.cadetID}</td>
+                    <td>${cadet.name}</td>
+                    <td>${cadet.rank}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="editCadet('${cadet._id}')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCadet('${cadet._id}')">Delete</button>
+                    </td>
                 `;
-                blogsTableBody.insertAdjacentHTML('beforeend', row);
+                tbody.appendChild(row);
             });
         }
 
-        // Add a new blog
-        document.getElementById('blogForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const blogTitle = document.getElementById('blogTitle').value;
-            const blogContent = document.getElementById('blogContent').value;
+        loadCadets();
 
-            const response = await fetch(blogApiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ title: blogTitle, content: blogContent })
-            });
+        function makeBold() {
+            const content = document.getElementById('blogContent');
+            content.style.fontWeight = content.style.fontWeight === 'bold' ? 'normal' : 'bold';
+        }
 
-            if (response.ok) {
-                alert('Blog added successfully!');
-                fetchBlogs(); // Refresh the blog list
-                document.getElementById('blogForm').reset(); // Reset the form
-            } else {
-                alert('Failed to add blog.');
-            }
+        function makeItalic() {
+            const content = document.getElementById('blogContent');
+            content.style.fontStyle = content.style.fontStyle === 'italic' ? 'normal' : 'italic';
+        }
+
+        document.getElementById('fontSelect').addEventListener('change', (e) => {
+            document.getElementById('blogContent').style.fontFamily = e.target.value;
         });
-
-        // Edit blog
-        async function editBlog(id, title, content) {
-            document.getElementById('blogTitle').value = title;
-            document.getElementById('blogContent').value = content;
-
-            const addBlogBtn = document.getElementById('addBlogBtn');
-            addBlogBtn.innerText = 'Update Blog';
-            addBlogBtn.onclick = async () => {
-                const updatedBlog = {
-                    title: document.getElementById('blogTitle').value,
-                    content: document.getElementById('blogContent').value
-                };
-
-                const response = await fetch(`${blogApiUrl}/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updatedBlog)
-                });
-
-                if (response.ok) {
-                    alert('Blog updated successfully!');
-                    fetchBlogs(); // Refresh the blog list
-                    addBlogBtn.innerText = 'Add Blog'; // Reset button text
-                    addBlogBtn.onclick = addBlog; // Reset button function
-                    document.getElementById('blogForm').reset(); // Reset the form
-                } else {
-                    alert('Failed to update blog.');
-                }
-            };
-        }
-
-        // Delete blog
-        async function deleteBlog(id) {
-            const response = await fetch(`${blogApiUrl}/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                alert('Blog deleted successfully!');
-                fetchBlogs(); // Refresh the blog list
-            } else {
-                alert('Failed to delete blog.');
-            }
-        }
-
-        // Load cadets and blogs when the page loads
-        window.onload = () => {
-            fetchCadets();
-            fetchBlogs();
-        };
     </script>
 </body>
 </html>
