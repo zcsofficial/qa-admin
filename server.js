@@ -4,6 +4,7 @@ const cors = require('cors');
 const admin = require('firebase-admin');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid'); // For generating unique filenames
+const admin = require('./zcs-ncc-firebase-adminsdk-bpjmt-3f4cf93c2c.json');
 
 // Set up Express App
 const app = express();
@@ -20,7 +21,7 @@ mongoose.connect(mongoURI, {
 .catch(error => console.error('Error connecting to MongoDB:', error));
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('zcs-ncc-firebase-adminsdk-bpjmt-3f4cf93c2c.json'); // Replace this with the actual path to your Firebase Admin SDK key file
+const serviceAccount = require('./zcs-ncc-firebase-adminsdk-bpjmt-3f4cf93c2c.json'); // Replace this with the actual path to your Firebase Admin SDK key file
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
