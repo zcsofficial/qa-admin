@@ -20,14 +20,14 @@ mongoose.connect(mongoURI, {
 .catch(error => console.error('Error connecting to MongoDB:', error));
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('./zcs-ncc-firebase-adminsdk-bpjmt-3f4cf93c2c.json'); // Replace this with the actual path to your Firebase Admin SDK key file
+const serviceAccount = require('./zcs-ncc-firebase-adminsdk-bpjmt-3f4cf93c2c.json'); // Path to your Firebase Admin SDK key file
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    storageBucket: 'zcs-ncc.appspot.com' // Use the correct bucket from your Firebase project
+    storageBucket: 'zcs-ncc.appspot.com' // Correct bucket from your Firebase project
 });
 
-// Mongoose Schema and Models
+// Mongoose Schemas and Models
 const cadetSchema = new mongoose.Schema({
     cadetID: { type: String, required: true },
     name: { type: String, required: true },

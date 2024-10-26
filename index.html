@@ -26,6 +26,7 @@
             color: white;
             text-align: center;
             padding: 100px 0;
+            position: relative;
         }
         .header-banner h1 {
             font-size: 3rem;
@@ -39,7 +40,7 @@
             margin-top: 20px;
         }
         .blog-post-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: #333;
         }
         .blog-post-content {
@@ -63,6 +64,9 @@
     <header class="header-banner">
         <h1>NCC Blog Portal</h1>
         <p>Stay updated with the latest events and updates</p>
+        <div class="position-absolute bottom-0 start-50 translate-middle-x mb-4">
+            <a href="#recent-blogs" class="btn btn-light btn-lg">Explore Blogs</a>
+        </div>
     </header>
 
     <!-- Navbar -->
@@ -84,7 +88,7 @@
     </nav>
 
     <!-- Blog Content Section -->
-    <main class="container my-5">
+    <main class="container my-5" id="recent-blogs">
         <h2 class="text-center mb-4">Recent Blogs</h2>
         
         <div id="blogPosts" class="row">

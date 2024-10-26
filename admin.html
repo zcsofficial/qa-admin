@@ -1,353 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Manage Cadets and Blogs</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: #f8f9fa;
+            background-color: #f8f9fa;
         }
         .container {
-            margin-top: 50px;
+            margin-top: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        table th, table td {
-            vertical-align: middle;
+        h1 {
+            margin-bottom: 30px;
+        }
+        .blog-post, .cadet-card {
+            margin-bottom: 30px;
         }
     </style>
 </head>
+
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">NCC Admin</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="attendance.html">Attendance</a></li>
-                    <li class="nav-item"><a class="nav-link" href="events.html">Events</a></li>
-                </ul>
-            </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#blogSection">Manage Blogs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#cadetSection">Manage Cadets</a>
+                </li>
+            </ul>
         </div>
     </nav>
 
-    <div class="container">
-        <h2 class="text-center">Manage Cadets</h2>
-        <form id="cadetForm" class="mb-4">
-            <div class="mb-3">
-                <label for="cadetID" class="form-label">Cadet ID</label>
-                <input type="text" class="form-control" id="cadetID" required>
+    <!-- Blog Upload Section -->
+    <div class="container" id="blogSection">
+        <h1>Upload a New Blog Post</h1>
+        <form id="blogForm">
+            <div class="form-group">
+                <label for="title">Blog Title</label>
+                <input type="text" class="form-control" id="title" placeholder="Enter blog title" required>
             </div>
-            <div class="mb-3">
-                <label for="cadetName" class="form-label">Name</label>
-                <input type="text" class="form-control" id="cadetName" required>
+            <div class="form-group">
+                <label for="content">Blog Content</label>
+                <textarea class="form-control" id="content" rows="10" placeholder="Write your blog content here" required></textarea>
             </div>
-            <div class="mb-3">
-                <label for="cadetRank" class="form-label">Rank</label>
-                <input type="text" class="form-control" id="cadetRank" required>
+            <div class="form-group">
+                <label for="image">Upload Image</label>
+                <input type="file" class="form-control-file" id="image" accept="image/*">
             </div>
-            <button type="submit" class="btn btn-primary" id="addCadetBtn">Add Cadet</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
+        <div id="responseMessage" class="mt-4"></div>
 
-        <h3 class="text-center">Cadets List</h3>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Cadet ID</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Rank</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="cadetsTableBody">
-                <!-- Cadet data will be appended here -->
-            </tbody>
-        </table>
-
-        <!-- Blog Management Section -->
-        <h2 class="text-center mt-5">Manage Blogs</h2>
-        <form id="blogForm" class="mb-4">
-            <div class="mb-3">
-                <label for="blogTitle" class="form-label">Blog Title</label>
-                <input type="text" class="form-control" id="blogTitle" required>
-            </div>
-            <div class="mb-3">
-                <label for="blogContent" class="form-label">Blog Content</label>
-                <textarea class="form-control" id="blogContent" rows="5" required></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="blogImage" class="form-label">Upload Image</label>
-                <input type="file" class="form-control" id="blogImage" accept="image/*" required>
-            </div>
-            <button type="submit" class="btn btn-primary" id="addBlogBtn">Add Blog</button>
-        </form>
-
-        <h3 class="text-center">Blogs List</h3>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Title</th>
-                    <th scope="col">Content</th>
-                    <th scope="col">Image</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="blogsTableBody">
-                <!-- Blog data will be appended here -->
-            </tbody>
-        </table>
+        <h2 class="mt-5">Uploaded Blogs</h2>
+        <div id="blogList"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
+    <!-- Cadet Management Section -->
+    <div class="container mt-5" id="cadetSection">
+        <h1>Manage Cadets</h1>
+        <form id="cadetForm">
+            <div class="form-group">
+                <label for="cadetID">Cadet ID</label>
+                <input type="text" class="form-control" id="cadetID" placeholder="Enter cadet ID" required>
+            </div>
+            <div class="form-group">
+                <label for="cadetName">Cadet Name</label>
+                <input type="text" class="form-control" id="cadetName" placeholder="Enter cadet name" required>
+            </div>
+            <div class="form-group">
+                <label for="rank">Rank</label>
+                <input type="text" class="form-control" id="rank" placeholder="Enter cadet rank" required>
+            </div>
+            <div class="form-group">
+                <label for="isPresent">Is Present</label>
+                <select class="form-control" id="isPresent" required>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Cadet</button>
+        </form>
+
+        <h2 class="mt-5">Cadet List</h2>
+        <div id="cadetList"></div>
+    </div>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBLygLKuwR4Nqsp7rCGU2QAXGdimvUvWxM",
-            authDomain: "zcs-ncc.firebaseapp.com",
-            projectId: "zcs-ncc",
-            storageBucket: "zcs-ncc.appspot.com",
-            messagingSenderId: "671713528373",
-            appId: "1:671713528373:web:5db7ec5a9f23dd22fdff7c",
-            measurementId: "G-E5L5SHY875",
-        };
+        $(document).ready(function () {
+            // Blog Form Submission
+            $('#blogForm').on('submit', function (e) {
+                e.preventDefault();
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const storage = firebase.storage();
+                const title = $('#title').val();
+                const content = $('#content').val();
+                const image = $('#image')[0].files[0];
 
-        const cadetApiUrl = 'https://qa-admin-zj4d.onrender.com/api/cadets';
-        const blogApiUrl = 'https://qa-admin-zj4d.onrender.com/api/blogs';
-
-        // Function to fetch cadets from the API
-        async function fetchCadets() {
-            const response = await fetch(cadetApiUrl);
-            const cadets = await response.json();
-            const cadetsTableBody = document.getElementById('cadetsTableBody');
-            cadetsTableBody.innerHTML = ''; // Clear existing data
-
-            cadets.forEach(cadet => {
-                const row = `
-                    <tr>
-                        <td>${cadet.cadetID}</td>
-                        <td>${cadet.name}</td>
-                        <td>${cadet.rank}</td>
-                        <td>
-                            <button class="btn btn-warning" onclick="editCadet('${cadet._id}', '${cadet.cadetID}', '${cadet.name}', '${cadet.rank}')">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteCadet('${cadet._id}')">Delete</button>
-                        </td>
-                    </tr>
-                `;
-                cadetsTableBody.insertAdjacentHTML('beforeend', row);
-            });
-        }
-
-        // Function to add a new cadet
-        document.getElementById('cadetForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const cadetID = document.getElementById('cadetID').value;
-            const cadetName = document.getElementById('cadetName').value;
-            const cadetRank = document.getElementById('cadetRank').value;
-
-            const response = await fetch(cadetApiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ cadetID, name: cadetName, rank: cadetRank })
-            });
-
-            if (response.ok) {
-                alert('Cadet added successfully!');
-                fetchCadets(); // Refresh the cadet list
-                document.getElementById('cadetForm').reset(); // Reset the form
-            } else {
-                alert('Failed to add cadet.');
-            }
-        });
-
-        // Function to edit a cadet
-        async function editCadet(id, cadetID, name, rank) {
-            document.getElementById('cadetID').value = cadetID;
-            document.getElementById('cadetName').value = name;
-            document.getElementById('cadetRank').value = rank;
-
-            const addCadetBtn = document.getElementById('addCadetBtn');
-            addCadetBtn.innerText = 'Update Cadet';
-            addCadetBtn.onclick = async () => {
-                const updatedCadet = {
-                    cadetID: document.getElementById('cadetID').value,
-                    name: document.getElementById('cadetName').value,
-                    rank: document.getElementById('cadetRank').value
-                };
-
-                const response = await fetch(`${cadetApiUrl}/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updatedCadet)
-                });
-
-                if (response.ok) {
-                    alert('Cadet updated successfully!');
-                    fetchCadets(); // Refresh the cadet list
-                    addCadetBtn.innerText = 'Add Cadet'; // Reset button text
-                    addCadetBtn.onclick = addCadet; // Reset button function
-                    document.getElementById('cadetForm').reset(); // Reset the form
-                } else {
-                    alert('Failed to update cadet.');
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('content', content);
+                if (image) {
+                    formData.append('image', image);
                 }
-            };
-        }
 
-        // Function to delete a cadet
-        async function deleteCadet(id) {
-            const response = await fetch(`${cadetApiUrl}/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                alert('Cadet deleted successfully!');
-                fetchCadets(); // Refresh the cadet list
-            } else {
-                alert('Failed to delete cadet.');
-            }
-        }
-
-        // Function to fetch blogs from the API
-        async function fetchBlogs() {
-            const response = await fetch(blogApiUrl);
-            const blogs = await response.json();
-            const blogsTableBody = document.getElementById('blogsTableBody');
-            blogsTableBody.innerHTML = ''; // Clear existing data
-
-            blogs.forEach(blog => {
-                const row = `
-                    <tr>
-                        <td>${blog.title}</td>
-                        <td>${blog.content.substring(0, 50)}...</td>
-                        <td><img src="${blog.imageUrl}" alt="Blog Image" style="width: 100px; height: auto;"></td>
-                        <td>
-                            <button class="btn btn-warning" onclick="editBlog('${blog._id}', '${blog.title}', '${blog.content}', '${blog.imageUrl}')">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteBlog('${blog._id}')">Delete</button>
-                        </td>
-                    </tr>
-                `;
-                blogsTableBody.insertAdjacentHTML('beforeend', row);
-            });
-        }
-
-        // Function to upload image to Firebase
-        async function uploadImage(file) {
-            const storageRef = storage.ref();
-            const imageRef = storageRef.child(`blogImages/${file.name}`);
-            await imageRef.put(file);
-            return await imageRef.getDownloadURL();
-        }
-
-        // Function to add a new blog
-        document.getElementById('blogForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const blogTitle = document.getElementById('blogTitle').value;
-            const blogContent = document.getElementById('blogContent').value;
-            const blogImageFile = document.getElementById('blogImage').files[0];
-
-            try {
-                const imageUrl = await uploadImage(blogImageFile);
-                const response = await fetch(blogApiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+                $.ajax({
+                    url: '/upload-blog', // Your backend API endpoint
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        $('#responseMessage').html(`<div class="alert alert-success">${response.message}</div>`);
+                        $('#blogForm')[0].reset();
+                        loadBlogs(); // Reload blogs after successful upload
                     },
-                    body: JSON.stringify({ title: blogTitle, content: blogContent, imageUrl })
-                });
-
-                if (response.ok) {
-                    alert('Blog added successfully!');
-                    fetchBlogs(); // Refresh the blog list
-                    document.getElementById('blogForm').reset(); // Reset the form
-                } else {
-                    alert('Failed to add blog.');
-                }
-            } catch (error) {
-                alert('Image upload failed: ' + error.message);
-            }
-        });
-
-        // Function to edit a blog
-        async function editBlog(id, title, content, imageUrl) {
-            document.getElementById('blogTitle').value = title;
-            document.getElementById('blogContent').value = content;
-            const blogImageInput = document.getElementById('blogImage');
-            blogImageInput.value = ''; // Reset file input
-
-            const addBlogBtn = document.getElementById('addBlogBtn');
-            addBlogBtn.innerText = 'Update Blog';
-            addBlogBtn.onclick = async () => {
-                const updatedBlog = {
-                    title: document.getElementById('blogTitle').value,
-                    content: document.getElementById('blogContent').value,
-                };
-
-                // Check if a new image is uploaded
-                if (blogImageInput.files.length > 0) {
-                    const blogImageFile = blogImageInput.files[0];
-                    try {
-                        const newImageUrl = await uploadImage(blogImageFile);
-                        updatedBlog.imageUrl = newImageUrl;
-                    } catch (error) {
-                        alert('Image upload failed: ' + error.message);
-                        return; // Abort if image upload fails
+                    error: function (error) {
+                        $('#responseMessage').html(`<div class="alert alert-danger">Error uploading blog post.</div>`);
                     }
-                }
-
-                const response = await fetch(`${blogApiUrl}/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updatedBlog)
                 });
-
-                if (response.ok) {
-                    alert('Blog updated successfully!');
-                    fetchBlogs(); // Refresh the blog list
-                    addBlogBtn.innerText = 'Add Blog'; // Reset button text
-                    addBlogBtn.onclick = addBlog; // Reset button function
-                    document.getElementById('blogForm').reset(); // Reset the form
-                } else {
-                    alert('Failed to update blog.');
-                }
-            };
-        }
-
-        // Function to delete a blog
-        async function deleteBlog(id) {
-            const response = await fetch(`${blogApiUrl}/${id}`, {
-                method: 'DELETE'
             });
 
-            if (response.ok) {
-                alert('Blog deleted successfully!');
-                fetchBlogs(); // Refresh the blog list
-            } else {
-                alert('Failed to delete blog.');
+            // Load Blogs Function
+            function loadBlogs() {
+                $.ajax({
+                    url: '/blogs',
+                    type: 'GET',
+                    success: function (blogs) {
+                        $('#blogList').empty(); // Clear previous list
+                        blogs.forEach(blog => {
+                            const blogHTML = `
+                                <div class="blog-post">
+                                    <h3>${blog.title}</h3>
+                                    <p>${blog.content}</p>
+                                    ${blog.imageUrl ? `<img src="${blog.imageUrl}" alt="${blog.title}" style="max-width: 100%; height: auto;">` : ''}
+                                </div>
+                            `;
+                            $('#blogList').append(blogHTML);
+                        });
+                    },
+                    error: function (error) {
+                        $('#blogList').html('<div class="alert alert-danger">Error loading blogs.</div>');
+                    }
+                });
             }
-        }
 
-        // Load cadets and blogs when the page loads
-        window.onload = () => {
-            fetchCadets();
-            fetchBlogs();
-        };
+            // Cadet Form Submission
+            $('#cadetForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const cadetID = $('#cadetID').val();
+                const cadetName = $('#cadetName').val();
+                const rank = $('#rank').val();
+                const isPresent = $('#isPresent').val() === 'true';
+
+                const cadetData = { cadetID, name: cadetName, rank, isPresent };
+
+                $.ajax({
+                    url: '/api/cadets', // Your backend API endpoint
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(cadetData),
+                    success: function (response) {
+                        $('#cadetForm')[0].reset();
+                        loadCadets(); // Reload cadets after successful addition
+                    },
+                    error: function (error) {
+                        alert('Error adding cadet.');
+                    }
+                });
+            });
+
+            // Load Cadets Function
+            function loadCadets() {
+                $.ajax({
+                    url: '/api/cadets',
+                    type: 'GET',
+                    success: function (cadets) {
+                        $('#cadetList').empty(); // Clear previous list
+                        cadets.forEach(cadet => {
+                            const cadetHTML = `
+                                <div class="cadet-card card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${cadet.name} (ID: ${cadet.cadetID})</h5>
+                                        <p class="card-text">Rank: ${cadet.rank}</p>
+                                        <p class="card-text">Present: ${cadet.isPresent ? 'Yes' : 'No'}</p>
+                                        <button class="btn btn-warning btn-sm edit-cadet" data-id="${cadet._id}">Edit</button>
+                                        <button class="btn btn-danger btn-sm delete-cadet" data-id="${cadet._id}">Delete</button>
+                                    </div>
+                                </div>
+                            `;
+                            $('#cadetList').append(cadetHTML);
+                        });
+
+                        // Bind click events for edit and delete buttons
+                        $('.edit-cadet').on('click', function () {
+                            const cadetId = $(this).data('id');
+                            editCadet(cadetId);
+                        });
+
+                        $('.delete-cadet').on('click', function () {
+                            const cadetId = $(this).data('id');
+                            deleteCadet(cadetId);
+                        });
+                    },
+                    error: function (error) {
+                        $('#cadetList').html('<div class="alert alert-danger">Error loading cadets.</div>');
+                    }
+                });
+            }
+
+            // Edit Cadet Function
+            function editCadet(cadetId) {
+                $.ajax({
+                    url: `/api/cadets/${cadetId}`, // Your backend API endpoint to get cadet data
+                    type: 'GET',
+                    success: function (cadet) {
+                        $('#cadetID').val(cadet.cadetID);
+                        $('#cadetName').val(cadet.name);
+                        $('#rank').val(cadet.rank);
+                        $('#isPresent').val(cadet.isPresent);
+                        // Optionally you could also remove the submit button and add an update button
+                    },
+                    error: function (error) {
+                        alert('Error loading cadet data for editing.');
+                    }
+                });
+            }
+
+            // Load cadets on page load
+            loadBlogs();
+            loadCadets();
+        });
     </script>
 </body>
+
 </html>
