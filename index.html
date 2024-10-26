@@ -1,156 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NCC Admin Panel</title>
+    <title>Admin Panel - Manage Cadets</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            background: #f8f9fa;
         }
-
         .container {
             margin-top: 50px;
         }
-
-        table {
-            margin-top: 20px;
-        }
-
-        .btn-edit {
-            color: #ffc107;
-        }
-
-        .btn-delete {
-            color: #dc3545;
-        }
-
-        .btn-edit:hover,
-        .btn-delete:hover {
-            cursor: pointer;
+        table th, table td {
+            vertical-align: middle;
         }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <h1 class="text-center">NCC Admin Panel</h1>
-        <form id="cadetForm">
-            <div class="row">
-                <div class="col-md-4">
-                    <input type="text" class="form-control" id="cadetName" placeholder="Cadet Name" required>
-                </div>
-                <div class="col-md-4">
-                    <input type="text" class="form-control" id="cadetRank" placeholder="Rank" required>
-                </div>
-                <div class="col-md-4">
-                    <input type="number" class="form-control" id="cadetYear" placeholder="Year" required>
-                </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">NCC Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="attendance.html">Attendance</a></li>
+                    <li class="nav-item"><a class="nav-link" href="events.html">Events</a></li>
+                </ul>
             </div>
-            <button type="submit" class="btn btn-primary mt-3">Add Cadet</button>
+        </div>
+    </nav>
+
+    <!-- Admin Panel -->
+    <div class="container">
+        <h2 class="text-center">Manage Cadets</h2>
+        <form id="cadetForm" class="mb-4">
+            <div class="mb-3">
+                <label for="cadetID" class="form-label">Cadet ID</label>
+                <input type="text" class="form-control" id="cadetID" required>
+            </div>
+            <div class="mb-3">
+                <label for="cadetName" class="form-label">Name</label>
+                <input type="text" class="form-control" id="cadetName" required>
+            </div>
+            <div class="mb-3">
+                <label for="cadetRank" class="form-label">Rank</label>
+                <input type="text" class="form-control" id="cadetRank" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="addCadetBtn">Add Cadet</button>
         </form>
 
-        <table class="table table-striped mt-4" id="cadetsTable">
+        <h3 class="text-center">Cadets List</h3>
+        <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Cudet ID</th>
-                    <th>Name</th>
-                    <th>Rank</th>
-                    <th>Year</th>
-                    <th>Actions</th>
+                    <th scope="col">Cadet ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Rank</th>
+                    <th scope="col">Actions</th>
                 </tr>
             </thead>
-            <tbody id="cadetsBody">
-                <!-- Cadets will be populated here -->
+            <tbody id="cadetsTableBody">
+                <!-- Cadet data will be appended here -->
             </tbody>
         </table>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script>
-        const apiUrl = 'https://qa-ncc-1.onrender.com'; // Update with your API URL
+        const apiUrl = 'https://qa-admin-zj4d.onrender.com/api/cadets';
 
-        // Load cadets
-        function loadCadets() {
-            $.get(`${apiUrl}/cadets`, function (cadets) {
-                $('#cadetsBody').empty();
-                cadets.forEach(cadet => {
-                    $('#cadetsBody').append(`
-                        <tr>
-                            <td>${cadet.id}</td>
-                            <td>${cadet.name}</td>
-                            <td>${cadet.rank}</td>
-                            <td>${cadet.year}</td>
-                            <td>
-                                <button class="btn btn-edit" onclick="editCadet(${cadet.id})">Edit</button>
-                                <button class="btn btn-delete" onclick="deleteCadet(${cadet.id})">Delete</button>
-                            </td>
-                        </tr>
-                    `);
-                });
+        // Fetch cadets from the API
+        async function fetchCadets() {
+            const response = await fetch(apiUrl);
+            const cadets = await response.json();
+            const cadetsTableBody = document.getElementById('cadetsTableBody');
+            cadetsTableBody.innerHTML = ''; // Clear existing data
+
+            cadets.forEach(cadet => {
+                const row = `
+                    <tr>
+                        <td>${cadet.cadetID}</td>
+                        <td>${cadet.name}</td>
+                        <td>${cadet.rank}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="editCadet('${cadet._id}', '${cadet.cadetID}', '${cadet.name}', '${cadet.rank}')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteCadet('${cadet._id}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                cadetsTableBody.insertAdjacentHTML('beforeend', row);
             });
         }
 
-        // Add cadet
-        $('#cadetForm').submit(function (event) {
+        // Add a new cadet
+        document.getElementById('cadetForm').addEventListener('submit', async (event) => {
             event.preventDefault();
-            const name = $('#cadetName').val();
-            const rank = $('#cadetRank').val();
-            const year = $('#cadetYear').val();
+            const cadetID = document.getElementById('cadetID').value;
+            const cadetName = document.getElementById('cadetName').value;
+            const cadetRank = document.getElementById('cadetRank').value;
 
-            $.post(`${apiUrl}/cadets`, { name, rank, year }, function () {
-                loadCadets();
-                $('#cadetForm')[0].reset();
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ cadetID, name: cadetName, rank: cadetRank })
             });
+
+            if (response.ok) {
+                alert('Cadet added successfully!');
+                fetchCadets(); // Refresh the cadet list
+                document.getElementById('cadetForm').reset(); // Reset the form
+            } else {
+                alert('Failed to add cadet.');
+            }
         });
 
         // Edit cadet
-        function editCadet(id) {
-            $.get(`${apiUrl}/cadets/${id}`, function (cadet) {
-                $('#cadetName').val(cadet.name);
-                $('#cadetRank').val(cadet.rank);
-                $('#cadetYear').val(cadet.year);
-                $('#cadetForm').off('submit').submit(function (event) {
-                    event.preventDefault();
-                    $.ajax({
-                        url: `${apiUrl}/cadets/${id}`,
-                        type: 'PUT',
-                        data: {
-                            name: $('#cadetName').val(),
-                            rank: $('#cadetRank').val(),
-                            year: $('#cadetYear').val()
-                        },
-                        success: function () {
-                            loadCadets();
-                            $('#cadetForm')[0].reset();
-                            $('#cadetForm').off('submit').submit(addCadet);
-                        }
-                    });
+        async function editCadet(id, cadetID, name, rank) {
+            document.getElementById('cadetID').value = cadetID;
+            document.getElementById('cadetName').value = name;
+            document.getElementById('cadetRank').value = rank;
+
+            // Remove the add button and replace it with an update button
+            const addCadetBtn = document.getElementById('addCadetBtn');
+            addCadetBtn.innerText = 'Update Cadet';
+            addCadetBtn.onclick = async () => {
+                const updatedCadet = {
+                    cadetID: document.getElementById('cadetID').value,
+                    name: document.getElementById('cadetName').value,
+                    rank: document.getElementById('cadetRank').value
+                };
+
+                const response = await fetch(`${apiUrl}/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedCadet)
                 });
-            });
+
+                if (response.ok) {
+                    alert('Cadet updated successfully!');
+                    fetchCadets(); // Refresh the cadet list
+                    addCadetBtn.innerText = 'Add Cadet'; // Reset button text
+                    addCadetBtn.onclick = addCadet; // Reset button function
+                    document.getElementById('cadetForm').reset(); // Reset the form
+                } else {
+                    alert('Failed to update cadet.');
+                }
+            };
         }
 
         // Delete cadet
-        function deleteCadet(id) {
-            if (confirm('Are you sure you want to delete this cadet?')) {
-                $.ajax({
-                    url: `${apiUrl}/cadets/${id}`,
-                    type: 'DELETE',
-                    success: function () {
-                        loadCadets();
-                    }
-                });
+        async function deleteCadet(id) {
+            const response = await fetch(`${apiUrl}/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('Cadet deleted successfully!');
+                fetchCadets(); // Refresh the cadet list
+            } else {
+                alert('Failed to delete cadet.');
             }
         }
 
-        $(document).ready(function () {
-            loadCadets();
-        });
+        // Load cadets when the page loads
+        window.onload = fetchCadets;
     </script>
 </body>
-
 </html>
