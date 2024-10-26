@@ -1,6 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const admin = require('firebase-admin');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid'); // For generating unique filenames
 
 // Set up Express App
 const app = express();
@@ -15,6 +18,14 @@ mongoose.connect(mongoURI, {
 })
 .then(() => console.log('Connected to MongoDB Atlas'))
 .catch(error => console.error('Error connecting to MongoDB:', error));
+
+// Initialize Firebase Admin SDK
+const serviceAccount = require('zcs-ncc-firebase-adminsdk-bpjmt-3f4cf93c2c.json'); // Replace this with the actual path to your Firebase Admin SDK key file
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: 'zcs-ncc.appspot.com' // Use the correct bucket from your Firebase project
+});
 
 // Mongoose Schema and Models
 const cadetSchema = new mongoose.Schema({
@@ -33,12 +44,17 @@ const eventSchema = new mongoose.Schema({
 const blogSchema = new mongoose.Schema({
     title: { type: String, required: true },
     content: { type: String, required: true },
-    date: { type: Date, default: Date.now }
+    date: { type: Date, default: Date.now },
+    imageUrl: { type: String } // Added field for the image URL
 });
 
 const Event = mongoose.model('Event', eventSchema);
-const Cadet = mongoose.model('Cadet', cadetSchema); // Cadet model for fetching data
-const Blog = mongoose.model('Blog', blogSchema); // Blog model for managing blog posts
+const Cadet = mongoose.model('Cadet', cadetSchema);
+const Blog = mongoose.model('Blog', blogSchema);
+
+// Set up Multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 // Routes
 
@@ -123,12 +139,41 @@ app.delete('/api/cadets/:id', async (req, res) => {
 // Blog Routes
 
 // Create a New Blog Post
-app.post('/api/blogs', async (req, res) => {
+app.post('/api/blogs', upload.single('image'), async (req, res) => {
     try {
         const { title, content } = req.body;
         const newBlog = new Blog({ title, content });
-        await newBlog.save();
-        res.status(201).json({ message: 'Blog post created successfully', blog: newBlog });
+
+        // Upload image to Firebase Storage if provided
+        if (req.file) {
+            const bucket = admin.storage().bucket();
+            const blob = bucket.file(`blogs/${uuidv4()}_${req.file.originalname}`);
+            const blobStream = blob.createWriteStream({
+                metadata: {
+                    contentType: req.file.mimetype,
+                },
+            });
+
+            blobStream.on('error', (error) => {
+                console.error('Error uploading file to Firebase:', error);
+                return res.status(500).json({ message: 'Error uploading file', error });
+            });
+
+            blobStream.on('finish', async () => {
+                // Get the public URL of the uploaded file
+                const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(blob.name)}?alt=media`;
+                newBlog.imageUrl = imageUrl;
+
+                await newBlog.save();
+                res.status(201).json({ message: 'Blog post created successfully', blog: newBlog });
+            });
+
+            blobStream.end(req.file.buffer); // End the stream
+        } else {
+            // Save blog without an image
+            await newBlog.save();
+            res.status(201).json({ message: 'Blog post created successfully', blog: newBlog });
+        }
     } catch (error) {
         res.status(500).json({ message: 'Error creating blog post', error });
     }
@@ -156,12 +201,40 @@ app.get('/api/blogs/:id', async (req, res) => {
 });
 
 // Update a Blog Post by ID
-app.put('/api/blogs/:id', async (req, res) => {
+app.put('/api/blogs/:id', upload.single('image'), async (req, res) => {
     try {
         const { title, content } = req.body;
-        const blog = await Blog.findByIdAndUpdate(req.params.id, { title, content }, { new: true });
-        if (!blog) return res.status(404).json({ message: 'Blog post not found' });
-        res.json(blog);
+        const updatedData = { title, content };
+
+        if (req.file) {
+            const bucket = admin.storage().bucket();
+            const blob = bucket.file(`blogs/${uuidv4()}_${req.file.originalname}`);
+            const blobStream = blob.createWriteStream({
+                metadata: {
+                    contentType: req.file.mimetype,
+                },
+            });
+
+            blobStream.on('error', (error) => {
+                console.error('Error uploading file to Firebase:', error);
+                return res.status(500).json({ message: 'Error uploading file', error });
+            });
+
+            blobStream.on('finish', async () => {
+                const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(blob.name)}?alt=media`;
+                updatedData.imageUrl = imageUrl;
+
+                const blog = await Blog.findByIdAndUpdate(req.params.id, updatedData, { new: true });
+                if (!blog) return res.status(404).json({ message: 'Blog post not found' });
+                res.json(blog);
+            });
+
+            blobStream.end(req.file.buffer);
+        } else {
+            const blog = await Blog.findByIdAndUpdate(req.params.id, updatedData, { new: true });
+            if (!blog) return res.status(404).json({ message: 'Blog post not found' });
+            res.json(blog);
+        }
     } catch (error) {
         res.status(500).json({ message: 'Error updating blog post', error });
     }

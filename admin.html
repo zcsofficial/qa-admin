@@ -81,6 +81,10 @@
                 <label for="blogContent" class="form-label">Blog Content</label>
                 <textarea class="form-control" id="blogContent" rows="5" required></textarea>
             </div>
+            <div class="mb-3">
+                <label for="blogImage" class="form-label">Upload Image</label>
+                <input type="file" class="form-control" id="blogImage" accept="image/*" required>
+            </div>
             <button type="submit" class="btn btn-primary" id="addBlogBtn">Add Blog</button>
         </form>
 
@@ -90,6 +94,7 @@
                 <tr>
                     <th scope="col">Title</th>
                     <th scope="col">Content</th>
+                    <th scope="col">Image</th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
@@ -100,11 +105,28 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
     <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLygLKuwR4Nqsp7rCGU2QAXGdimvUvWxM",
+            authDomain: "zcs-ncc.firebaseapp.com",
+            projectId: "zcs-ncc",
+            storageBucket: "zcs-ncc.appspot.com",
+            messagingSenderId: "671713528373",
+            appId: "1:671713528373:web:5db7ec5a9f23dd22fdff7c",
+            measurementId: "G-E5L5SHY875",
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+
         const cadetApiUrl = 'https://qa-admin-zj4d.onrender.com/api/cadets';
         const blogApiUrl = 'https://qa-admin-zj4d.onrender.com/api/blogs';
 
-        // Fetch cadets from the API
+        // Function to fetch cadets from the API
         async function fetchCadets() {
             const response = await fetch(cadetApiUrl);
             const cadets = await response.json();
@@ -127,7 +149,7 @@
             });
         }
 
-        // Add a new cadet
+        // Function to add a new cadet
         document.getElementById('cadetForm').addEventListener('submit', async (event) => {
             event.preventDefault();
             const cadetID = document.getElementById('cadetID').value;
@@ -151,13 +173,12 @@
             }
         });
 
-        // Edit cadet
+        // Function to edit a cadet
         async function editCadet(id, cadetID, name, rank) {
             document.getElementById('cadetID').value = cadetID;
             document.getElementById('cadetName').value = name;
             document.getElementById('cadetRank').value = rank;
 
-            // Remove the add button and replace it with an update button
             const addCadetBtn = document.getElementById('addCadetBtn');
             addCadetBtn.innerText = 'Update Cadet';
             addCadetBtn.onclick = async () => {
@@ -187,7 +208,7 @@
             };
         }
 
-        // Delete cadet
+        // Function to delete a cadet
         async function deleteCadet(id) {
             const response = await fetch(`${cadetApiUrl}/${id}`, {
                 method: 'DELETE'
@@ -201,7 +222,7 @@
             }
         }
 
-        // Fetch blogs from the API
+        // Function to fetch blogs from the API
         async function fetchBlogs() {
             const response = await fetch(blogApiUrl);
             const blogs = await response.json();
@@ -213,8 +234,9 @@
                     <tr>
                         <td>${blog.title}</td>
                         <td>${blog.content.substring(0, 50)}...</td>
+                        <td><img src="${blog.imageUrl}" alt="Blog Image" style="width: 100px; height: auto;"></td>
                         <td>
-                            <button class="btn btn-warning" onclick="editBlog('${blog._id}', '${blog.title}', '${blog.content}')">Edit</button>
+                            <button class="btn btn-warning" onclick="editBlog('${blog._id}', '${blog.title}', '${blog.content}', '${blog.imageUrl}')">Edit</button>
                             <button class="btn btn-danger" onclick="deleteBlog('${blog._id}')">Delete</button>
                         </td>
                     </tr>
@@ -223,41 +245,69 @@
             });
         }
 
-        // Add a new blog
+        // Function to upload image to Firebase
+        async function uploadImage(file) {
+            const storageRef = storage.ref();
+            const imageRef = storageRef.child(`blogImages/${file.name}`);
+            await imageRef.put(file);
+            return await imageRef.getDownloadURL();
+        }
+
+        // Function to add a new blog
         document.getElementById('blogForm').addEventListener('submit', async (event) => {
             event.preventDefault();
             const blogTitle = document.getElementById('blogTitle').value;
             const blogContent = document.getElementById('blogContent').value;
+            const blogImageFile = document.getElementById('blogImage').files[0];
 
-            const response = await fetch(blogApiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ title: blogTitle, content: blogContent })
-            });
+            try {
+                const imageUrl = await uploadImage(blogImageFile);
+                const response = await fetch(blogApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title: blogTitle, content: blogContent, imageUrl })
+                });
 
-            if (response.ok) {
-                alert('Blog added successfully!');
-                fetchBlogs(); // Refresh the blog list
-                document.getElementById('blogForm').reset(); // Reset the form
-            } else {
-                alert('Failed to add blog.');
+                if (response.ok) {
+                    alert('Blog added successfully!');
+                    fetchBlogs(); // Refresh the blog list
+                    document.getElementById('blogForm').reset(); // Reset the form
+                } else {
+                    alert('Failed to add blog.');
+                }
+            } catch (error) {
+                alert('Image upload failed: ' + error.message);
             }
         });
 
-        // Edit blog
-        async function editBlog(id, title, content) {
+        // Function to edit a blog
+        async function editBlog(id, title, content, imageUrl) {
             document.getElementById('blogTitle').value = title;
             document.getElementById('blogContent').value = content;
+            const blogImageInput = document.getElementById('blogImage');
+            blogImageInput.value = ''; // Reset file input
 
             const addBlogBtn = document.getElementById('addBlogBtn');
             addBlogBtn.innerText = 'Update Blog';
             addBlogBtn.onclick = async () => {
                 const updatedBlog = {
                     title: document.getElementById('blogTitle').value,
-                    content: document.getElementById('blogContent').value
+                    content: document.getElementById('blogContent').value,
                 };
+
+                // Check if a new image is uploaded
+                if (blogImageInput.files.length > 0) {
+                    const blogImageFile = blogImageInput.files[0];
+                    try {
+                        const newImageUrl = await uploadImage(blogImageFile);
+                        updatedBlog.imageUrl = newImageUrl;
+                    } catch (error) {
+                        alert('Image upload failed: ' + error.message);
+                        return; // Abort if image upload fails
+                    }
+                }
 
                 const response = await fetch(`${blogApiUrl}/${id}`, {
                     method: 'PUT',
@@ -279,7 +329,7 @@
             };
         }
 
-        // Delete blog
+        // Function to delete a blog
         async function deleteBlog(id) {
             const response = await fetch(`${blogApiUrl}/${id}`, {
                 method: 'DELETE'

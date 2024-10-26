@@ -51,6 +51,10 @@
             padding: 20px 0;
             text-align: center;
         }
+        .card img {
+            height: 200px;
+            object-fit: cover; /* Ensures the image covers the space */
+        }
     </style>
 </head>
 <body>
@@ -119,10 +123,11 @@
                 const blogHTML = `
                     <div class="col-md-6 col-lg-4 blog-post">
                         <div class="card h-100 shadow-sm">
+                            <img src="${blog.imageUrl}" class="card-img-top" alt="${blog.title}">
                             <div class="card-body">
                                 <h5 class="card-title blog-post-title">${blog.title}</h5>
                                 <p class="card-text blog-post-content">${blog.content.substring(0, 100)}...</p>
-                                <a href="#" class="btn btn-primary">Read More</a>
+                                <a href="blog-detail.html?id=${blog._id}" class="btn btn-primary">Read More</a>
                             </div>
                             <div class="card-footer text-muted">
                                 <small>Published on ${new Date(blog.date).toLocaleDateString()}</small>
