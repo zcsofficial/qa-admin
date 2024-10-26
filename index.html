@@ -3,178 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Manage Cadets</title>
+    <title>NCC Blog</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: #f8f9fa;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        table th, table td {
-            vertical-align: middle;
-        }
-    </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">NCC Admin</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="attendance.html">Attendance</a></li>
-                    <li class="nav-item"><a class="nav-link" href="events.html">Events</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Admin Panel -->
     <div class="container">
-        <h2 class="text-center">Manage Cadets</h2>
-        <form id="cadetForm" class="mb-4">
-            <div class="mb-3">
-                <label for="cadetID" class="form-label">Cadet ID</label>
-                <input type="text" class="form-control" id="cadetID" required>
-            </div>
-            <div class="mb-3">
-                <label for="cadetName" class="form-label">Name</label>
-                <input type="text" class="form-control" id="cadetName" required>
-            </div>
-            <div class="mb-3">
-                <label for="cadetRank" class="form-label">Rank</label>
-                <input type="text" class="form-control" id="cadetRank" required>
-            </div>
-            <button type="submit" class="btn btn-primary" id="addCadetBtn">Add Cadet</button>
-        </form>
-
-        <h3 class="text-center">Cadets List</h3>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Cadet ID</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Rank</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="cadetsTableBody">
-                <!-- Cadet data will be appended here -->
-            </tbody>
-        </table>
+        <h1 class="text-center mt-5">Welcome to NCC Blog</h1>
+        <h2 class="text-center mt-4">Latest Blogs</h2>
+        <div id="blogsContainer" class="mt-4">
+            <!-- Blog posts will be dynamically inserted here -->
+        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script>
-        const apiUrl = 'https://qa-admin-zj4d.onrender.com/api/cadets';
+        const blogApiUrl = 'https://qa-admin-zj4d.onrender.com/api/blogs';
 
-        // Fetch cadets from the API
-        async function fetchCadets() {
-            const response = await fetch(apiUrl);
-            const cadets = await response.json();
-            const cadetsTableBody = document.getElementById('cadetsTableBody');
-            cadetsTableBody.innerHTML = ''; // Clear existing data
+        async function fetchBlogs() {
+            const response = await fetch(blogApiUrl);
+            const blogs = await response.json();
+            const blogsContainer = document.getElementById('blogsContainer');
 
-            cadets.forEach(cadet => {
-                const row = `
-                    <tr>
-                        <td>${cadet.cadetID}</td>
-                        <td>${cadet.name}</td>
-                        <td>${cadet.rank}</td>
-                        <td>
-                            <button class="btn btn-warning" onclick="editCadet('${cadet._id}', '${cadet.cadetID}', '${cadet.name}', '${cadet.rank}')">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteCadet('${cadet._id}')">Delete</button>
-                        </td>
-                    </tr>
+            blogsContainer.innerHTML = ''; // Clear existing data
+
+            blogs.forEach(blog => {
+                const blogPost = `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">${blog.title}</h5>
+                            <p class="card-text">${blog.content.substring(0, 100)}...</p>
+                            <a href="#" class="btn btn-primary">Read More</a>
+                        </div>
+                    </div>
                 `;
-                cadetsTableBody.insertAdjacentHTML('beforeend', row);
+                blogsContainer.insertAdjacentHTML('beforeend', blogPost);
             });
         }
 
-        // Add a new cadet
-        document.getElementById('cadetForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const cadetID = document.getElementById('cadetID').value;
-            const cadetName = document.getElementById('cadetName').value;
-            const cadetRank = document.getElementById('cadetRank').value;
-
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ cadetID, name: cadetName, rank: cadetRank })
-            });
-
-            if (response.ok) {
-                alert('Cadet added successfully!');
-                fetchCadets(); // Refresh the cadet list
-                document.getElementById('cadetForm').reset(); // Reset the form
-            } else {
-                alert('Failed to add cadet.');
-            }
-        });
-
-        // Edit cadet
-        async function editCadet(id, cadetID, name, rank) {
-            document.getElementById('cadetID').value = cadetID;
-            document.getElementById('cadetName').value = name;
-            document.getElementById('cadetRank').value = rank;
-
-            // Remove the add button and replace it with an update button
-            const addCadetBtn = document.getElementById('addCadetBtn');
-            addCadetBtn.innerText = 'Update Cadet';
-            addCadetBtn.onclick = async () => {
-                const updatedCadet = {
-                    cadetID: document.getElementById('cadetID').value,
-                    name: document.getElementById('cadetName').value,
-                    rank: document.getElementById('cadetRank').value
-                };
-
-                const response = await fetch(`${apiUrl}/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updatedCadet)
-                });
-
-                if (response.ok) {
-                    alert('Cadet updated successfully!');
-                    fetchCadets(); // Refresh the cadet list
-                    addCadetBtn.innerText = 'Add Cadet'; // Reset button text
-                    addCadetBtn.onclick = addCadet; // Reset button function
-                    document.getElementById('cadetForm').reset(); // Reset the form
-                } else {
-                    alert('Failed to update cadet.');
-                }
-            };
-        }
-
-        // Delete cadet
-        async function deleteCadet(id) {
-            const response = await fetch(`${apiUrl}/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                alert('Cadet deleted successfully!');
-                fetchCadets(); // Refresh the cadet list
-            } else {
-                alert('Failed to delete cadet.');
-            }
-        }
-
-        // Load cadets when the page loads
-        window.onload = fetchCadets;
+        window.onload = fetchBlogs; // Load blogs on page load
     </script>
 </body>
 </html>
