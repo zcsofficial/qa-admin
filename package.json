@@ -1,0 +1,27 @@
+{
+  "name": "ncc-admin-panel",
+  "version": "1.0.0",
+  "description": "Admin panel for managing NCC cadets and events.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "keywords": [
+    "ncc",
+    "admin-panel",
+    "cadets",
+    "mongodb",
+    "express"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
