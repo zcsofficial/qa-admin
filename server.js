@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -31,8 +30,15 @@ const eventSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now }
 });
 
+const blogSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    date: { type: Date, default: Date.now }
+});
+
 const Event = mongoose.model('Event', eventSchema);
 const Cadet = mongoose.model('Cadet', cadetSchema); // Cadet model for fetching data
+const Blog = mongoose.model('Blog', blogSchema); // Blog model for managing blog posts
 
 // Routes
 
@@ -111,6 +117,64 @@ app.delete('/api/cadets/:id', async (req, res) => {
         res.status(204).json({ message: 'Cadet deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting cadet', error });
+    }
+});
+
+// Blog Routes
+
+// Create a New Blog Post
+app.post('/api/blogs', async (req, res) => {
+    try {
+        const { title, content } = req.body;
+        const newBlog = new Blog({ title, content });
+        await newBlog.save();
+        res.status(201).json({ message: 'Blog post created successfully', blog: newBlog });
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating blog post', error });
+    }
+});
+
+// Get All Blog Posts
+app.get('/api/blogs', async (req, res) => {
+    try {
+        const blogs = await Blog.find();
+        res.json(blogs);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching blog posts', error });
+    }
+});
+
+// Get a Blog Post by ID
+app.get('/api/blogs/:id', async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
+        if (!blog) return res.status(404).json({ message: 'Blog post not found' });
+        res.json(blog);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching blog post', error });
+    }
+});
+
+// Update a Blog Post by ID
+app.put('/api/blogs/:id', async (req, res) => {
+    try {
+        const { title, content } = req.body;
+        const blog = await Blog.findByIdAndUpdate(req.params.id, { title, content }, { new: true });
+        if (!blog) return res.status(404).json({ message: 'Blog post not found' });
+        res.json(blog);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating blog post', error });
+    }
+});
+
+// Delete a Blog Post by ID
+app.delete('/api/blogs/:id', async (req, res) => {
+    try {
+        const blog = await Blog.findByIdAndDelete(req.params.id);
+        if (!blog) return res.status(404).json({ message: 'Blog post not found' });
+        res.status(204).json({ message: 'Blog post deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting blog post', error });
     }
 });
 
