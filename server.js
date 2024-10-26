@@ -1,16 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const multer = require('multer'); // For handling file uploads
-const path = require('path');
 
 // Set up Express App
 const app = express();
 app.use(express.json());
 app.use(cors());
-
-// Serve static files from the 'uploads' directory
-app.use('/uploads', express.static('uploads'));
 
 // MongoDB Connection (Make sure to replace with your actual MongoDB URI)
 const mongoURI = 'mongodb+srv://adnankstheredteamlabs:Adnan%4066202@cluster0.qrppz7h.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
@@ -38,25 +33,12 @@ const eventSchema = new mongoose.Schema({
 const blogSchema = new mongoose.Schema({
     title: { type: String, required: true },
     content: { type: String, required: true },
-    image: { type: String }, // URL of the image
     date: { type: Date, default: Date.now }
 });
 
 const Event = mongoose.model('Event', eventSchema);
 const Cadet = mongoose.model('Cadet', cadetSchema); // Cadet model for fetching data
 const Blog = mongoose.model('Blog', blogSchema); // Blog model for managing blog posts
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Directory for storing uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`); // Unique filename
-    }
-});
-
-const upload = multer({ storage });
 
 // Routes
 
@@ -140,15 +122,11 @@ app.delete('/api/cadets/:id', async (req, res) => {
 
 // Blog Routes
 
-// Create a New Blog Post with Image Upload
-app.post('/api/blogs', upload.single('image'), async (req, res) => {
+// Create a New Blog Post
+app.post('/api/blogs', async (req, res) => {
     try {
         const { title, content } = req.body;
-        const newBlog = new Blog({ 
-            title, 
-            content, 
-            image: req.file ? `/uploads/${req.file.filename}` : null // Save the image path
-        });
+        const newBlog = new Blog({ title, content });
         await newBlog.save();
         res.status(201).json({ message: 'Blog post created successfully', blog: newBlog });
     } catch (error) {
@@ -178,16 +156,10 @@ app.get('/api/blogs/:id', async (req, res) => {
 });
 
 // Update a Blog Post by ID
-app.put('/api/blogs/:id', upload.single('image'), async (req, res) => {
+app.put('/api/blogs/:id', async (req, res) => {
     try {
         const { title, content } = req.body;
-        const updatedData = { title, content };
-
-        if (req.file) {
-            updatedData.image = `/uploads/${req.file.filename}`; // Update image path if a new image is uploaded
-        }
-
-        const blog = await Blog.findByIdAndUpdate(req.params.id, updatedData, { new: true });
+        const blog = await Blog.findByIdAndUpdate(req.params.id, { title, content }, { new: true });
         if (!blog) return res.status(404).json({ message: 'Blog post not found' });
         res.json(blog);
     } catch (error) {
