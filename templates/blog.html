@@ -25,7 +25,7 @@
 
             // Function to load all posts
             function loadPosts() {
-                $.get('http://127.0.0.1:5000/api/posts', function(data) {
+                $.get('https://qa-admin-1.onrender.com/api/posts', function(data) {
                     let postsHtml = '';
                     data.posts.forEach(function(post) {
                         postsHtml += `
