@@ -36,6 +36,17 @@
             padding: 20px 0;
             text-align: center;
         }
+
+        .post-image {
+            height: 200px; /* Set a fixed height for the image */
+            object-fit: cover; /* Maintain aspect ratio and fill the container */
+        }
+
+        .placeholder-image {
+            height: 200px;
+            object-fit: cover;
+            background-color: #ccc; /* Placeholder background */
+        }
     </style>
 </head>
 
@@ -98,9 +109,12 @@
                     // Ensure 'posts' is present in the response
                     if (data && data.posts && data.posts.length > 0) {
                         data.posts.forEach(function(post) {
+                            console.log("Post Data:", post); // Log each post data to check the image URL
+
                             postsHtml += `
                                 <div class="col-md-4 mb-4">
                                     <div class="card h-100 shadow-sm">
+                                        ${post.image_url ? `<img src="${post.image_url}" class="card-img-top post-image" alt="${post.title}" onerror="this.onerror=null; this.src='placeholder.png';">` : `<div class="placeholder-image"></div>`}
                                         <div class="card-body">
                                             <h5 class="card-title">${post.title}</h5>
                                             <h6 class="card-subtitle mb-2 text-muted">by ${post.author || 'Unknown'}</h6>
@@ -115,7 +129,7 @@
 
                     $('#postsContainer').html(postsHtml);
                 }).fail(function(xhr) {
-                    $('#postsContainer').html('<p class="text-danger">Error loading posts: ' + xhr.responseJSON.message + '</p>');
+                    $('#postsContainer').html('<p class="text-danger">Error loading posts: ' + (xhr.responseJSON.message || 'Unknown error') + '</p>');
                 });
             }
         });

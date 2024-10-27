@@ -48,6 +48,7 @@
                         <tr>
                             <th>Title</th>
                             <th>Content</th>
+                            <th>Image</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -79,6 +80,11 @@
                             <label for="postContent">Content</label>
                             <textarea class="form-control" id="postContent" rows="4" required></textarea>
                         </div>
+                        <div class="form-group">
+                            <label for="postImage">Upload Image</label>
+                            <input type="file" class="form-control-file" id="postImage" accept="image/*" required>
+                            <small class="form-text text-muted">Supported formats: JPG, PNG, GIF.</small>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -103,15 +109,16 @@
 
             // Function to load all posts
             function loadPosts() {
-                $.get('https://qa-admin-1.onrender.com/api/posts', function(data) {
+                $.get('http://127.0.0.1:5000/api/posts', function(data) {
                     let postRows = '';
                     data.posts.forEach(function(post) {
                         postRows += `
                             <tr>
                                 <td>${post.title}</td>
                                 <td>${post.content}</td>
+                                <td><img src="${post.image}" alt="${post.title}" style="max-height: 100px;"/></td>
                                 <td>
-                                    <button class="btn btn-sm btn-warning edit-post" data-id="${post._id}" data-title="${post.title}" data-content="${post.content}">
+                                    <button class="btn btn-sm btn-warning edit-post" data-id="${post._id}" data-title="${post.title}" data-content="${post.content}" data-image="${post.image}">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
                                     <button class="btn btn-sm btn-danger delete-post" data-id="${post._id}">
@@ -131,13 +138,39 @@
                 e.preventDefault();
                 const title = $('#postTitle').val();
                 const content = $('#postContent').val();
+                const imageFile = $('#postImage')[0].files[0];
 
+                // Upload image to Imgur
+                const imgurClientId = 'e6dbbffef7d2b47'; // Replace with your Imgur Client ID
+                const formData = new FormData();
+                formData.append('image', imageFile);
+
+                $.ajax({
+                    url: 'https://api.imgur.com/3/image',
+                    type: 'POST',
+                    headers: {
+                        Authorization: 'Client-ID ' + imgurClientId
+                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        const imageUrl = response.data.link; // Get the uploaded image URL
+                        savePost(title, content, imageUrl);
+                    },
+                    error: function() {
+                        alert('Error uploading image.');
+                    }
+                });
+            });
+
+            function savePost(title, content, imageUrl) {
                 // Sending the post request with proper headers
                 $.ajax({
-                    url: 'https://qa-admin-1.onrender.com/api/post',
+                    url: 'http://127.0.0.1:5000/api/post',
                     type: 'POST',
-                    contentType: 'application/json', // Ensure correct content type
-                    data: JSON.stringify({ title, content }), // Send JSON data
+                    contentType: 'application/json',
+                    data: JSON.stringify({ title, content, image: imageUrl }), // Include the image URL
                     success: function(response) {
                         alert(response.message);
                         $('#createPostModal').modal('hide');
@@ -148,14 +181,14 @@
                         alert('Error creating post: ' + xhr.responseJSON.message);
                     }
                 });
-            });
+            }
 
             // Handle delete post
             $(document).on('click', '.delete-post', function() {
                 const postId = $(this).data('id');
                 if (confirm('Are you sure you want to delete this post?')) {
                     $.ajax({
-                        url: `https://qa-admin-1.onrender.com/api/post/${postId}`,
+                        url: `http://127.0.0.1:5000/api/post/${postId}`,
                         type: 'DELETE',
                         success: function(response) {
                             alert(response.message);
