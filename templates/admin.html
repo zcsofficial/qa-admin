@@ -121,6 +121,8 @@
                             </tr>`;
                     });
                     $('#postTableBody').html(postRows);
+                }).fail(function() {
+                    alert('Error loading posts.');
                 });
             }
 
@@ -135,8 +137,9 @@
                         alert(response.message);
                         $('#createPostModal').modal('hide');
                         loadPosts();
-                    }).fail(function() {
-                        alert('Error creating post.');
+                        $('#createPostForm')[0].reset();  // Reset the form fields
+                    }).fail(function(xhr) {
+                        alert('Error creating post: ' + xhr.responseJSON.message);
                     });
             });
 
@@ -151,8 +154,8 @@
                             alert(response.message);
                             loadPosts();
                         },
-                        error: function() {
-                            alert('Error deleting post.');
+                        error: function(xhr) {
+                            alert('Error deleting post: ' + xhr.responseJSON.message);
                         }
                     });
                 }
