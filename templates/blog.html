@@ -1,24 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>NCC Journey - Blog</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: url('c1.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .hero {
+            background: rgba(0, 0, 0, 0.5);
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+        }
+
+        footer {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">My Blog</h1>
-        <div id="postsContainer" class="mt-4">
+
+    <!-- Navbar with Rounded Container -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm rounded-pill mt-3 mx-auto" style="max-width: 95%; padding: 10px 30px;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">
+                <img src="logo.png" alt="Logo" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="attendance.html">Attendance</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="events.html">Events</a></li>
+                </ul>
+                <a href="index.html" class="btn btn-primary ms-3 rounded-pill">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero text-center">
+        <div>
+            <h1 class="display-4">Tales from My Journey</h1>
+            <p class="lead">I open the pages of my life to share stories of adventure, insights gained along the way, and the myriad emotions that paint the canvas of my existence.</p>
+        </div>
+    </header>
+
+    <!-- Blog Posts Section -->
+    <section class="container mt-5">
+        <h2 class="text-center mb-4">My Blog Posts</h2>
+        <div id="postsContainer" class="row">
             <!-- Blog posts will be dynamically loaded here -->
         </div>
-    </div>
+    </section>
 
-    <!-- jQuery and Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    
+    <footer>
+        <p>&copy; 2024 NCC Journey. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.js"></script>
     <script>
         $(document).ready(function() {
             loadPosts();
@@ -27,23 +94,25 @@
             function loadPosts() {
                 $.get('https://qa-admin-1.onrender.com/api/posts', function(data) {
                     let postsHtml = '';
-                    
+
                     // Ensure 'posts' is present in the response
                     if (data && data.posts && data.posts.length > 0) {
                         data.posts.forEach(function(post) {
                             postsHtml += `
-                                <div class="card mb-4">
-                                    <div class="card-body">
-                                        <h5 class="card-title">${post.title}</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">by ${post.author || 'Unknown'}</h6>
-                                        <p class="card-text">${post.content}</p>
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100 shadow-sm">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${post.title}</h5>
+                                            <h6 class="card-subtitle mb-2 text-muted">by ${post.author || 'Unknown'}</h6>
+                                            <p class="card-text">${post.content}</p>
+                                        </div>
                                     </div>
                                 </div>`;
                         });
                     } else {
                         postsHtml = '<p class="text-warning">No posts available.</p>';
                     }
-                    
+
                     $('#postsContainer').html(postsHtml);
                 }).fail(function(xhr) {
                     $('#postsContainer').html('<p class="text-danger">Error loading posts: ' + xhr.responseJSON.message + '</p>');
@@ -52,4 +121,5 @@
         });
     </script>
 </body>
+
 </html>
