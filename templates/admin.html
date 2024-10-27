@@ -132,15 +132,22 @@
                 const title = $('#postTitle').val();
                 const content = $('#postContent').val();
 
-                $.post('https://qa-admin-1.onrender.com/api/post', { title, content })
-                    .done(function(response) {
+                // Sending the post request with proper headers
+                $.ajax({
+                    url: 'https://qa-admin-1.onrender.com/api/post',
+                    type: 'POST',
+                    contentType: 'application/json', // Ensure correct content type
+                    data: JSON.stringify({ title, content }), // Send JSON data
+                    success: function(response) {
                         alert(response.message);
                         $('#createPostModal').modal('hide');
                         loadPosts();
                         $('#createPostForm')[0].reset();  // Reset the form fields
-                    }).fail(function(xhr) {
+                    },
+                    error: function(xhr) {
                         alert('Error creating post: ' + xhr.responseJSON.message);
-                    });
+                    }
+                });
             });
 
             // Handle delete post
