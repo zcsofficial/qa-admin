@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)
 
 # MongoDB Atlas connection string
-mongo_client = MongoClient("mongodb+srv://<username>:<password>@cluster0.qrppz7h.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+mongo_client = MongoClient("mongodb+srv://adnankstheredteamlabs:Adnan%4066202@cluster0.qrppz7h.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 db = mongo_client['blog_database']  # Use your database name
 posts_collection = db['posts']  # Use your collection name
 
