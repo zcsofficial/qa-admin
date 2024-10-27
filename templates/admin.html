@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
     <div class="d-flex" id="wrapper">
@@ -48,7 +48,6 @@
                         <tr>
                             <th>Title</th>
                             <th>Content</th>
-                            <th>Author</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -79,10 +78,6 @@
                         <div class="form-group">
                             <label for="postContent">Content</label>
                             <textarea class="form-control" id="postContent" rows="4" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="postAuthor">Author</label>
-                            <input type="text" class="form-control" id="postAuthor" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -115,12 +110,11 @@
                             <tr>
                                 <td>${post.title}</td>
                                 <td>${post.content}</td>
-                                <td>${post.author}</td> <!-- Display author -->
                                 <td>
-                                    <button class="btn btn-sm btn-warning edit-post" data-id="${post.id}" data-title="${post.title}" data-content="${post.content}">
+                                    <button class="btn btn-sm btn-warning edit-post" data-id="${post._id}" data-title="${post.title}" data-content="${post.content}">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
-                                    <button class="btn btn-sm btn-danger delete-post" data-id="${post.id}">
+                                    <button class="btn btn-sm btn-danger delete-post" data-id="${post._id}">
                                         <i class="fas fa-trash"></i> Delete
                                     </button>
                                 </td>
@@ -135,22 +129,15 @@
                 e.preventDefault();
                 const title = $('#postTitle').val();
                 const content = $('#postContent').val();
-                const author = $('#postAuthor').val(); // Include author
 
-                $.ajax({
-                    url: 'http://127.0.0.1:5000/api/post',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ title, content, author }),
-                    success: function(response) {
+                $.post('http://127.0.0.1:5000/api/post', { title, content })
+                    .done(function(response) {
                         alert(response.message);
                         $('#createPostModal').modal('hide');
                         loadPosts();
-                    },
-                    error: function() {
+                    }).fail(function() {
                         alert('Error creating post.');
-                    }
-                });
+                    });
             });
 
             // Handle delete post
@@ -170,11 +157,11 @@
                     });
                 }
             });
-        });
 
-        // Toggle sidebar
-        $('#menu-toggle').click(function() {
-            $('#sidebar').toggleClass('toggled');
+            // Toggle sidebar
+            $('#menu-toggle').click(function() {
+                $('#wrapper').toggleClass('toggled');
+            });
         });
     </script>
 </body>
