@@ -1,17 +1,19 @@
-body {
-    font-family: Arial, sans-serif;
+/* Custom Sidebar Styling */
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
 }
 
-h1, h2 {
-    margin-top: 20px;
+#page-content-wrapper {
+    flex: 1;
 }
 
-.container {
-    margin-top: 20px;
+/* Custom button styling for toggle */
+#menu-toggle {
+    font-size: 1.2rem;
+    border: none;
 }
 
-.blog-preview {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: 10px 0;
+.primary-text {
+    color: #ffc107;
 }
